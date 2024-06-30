@@ -3,25 +3,60 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --color-dark: #121212;
+  --color-light: #fafafa;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+html {
+  scroll-behavior: smooth;
+  letter-spacing: 0.3px;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background: radial-gradient(
+    ellipse 60% 50% at 50% -30%,
+    rgb(45 212 191 / 15%) 0%,
+    rgb(8 0 0 / 0%)
+  );
+}
+
+input,
+textarea,
+button,
+select,
+div,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.dark {
+  background-color: var(--color-dark);
+  color: var(--color-light);
+}
+
+.light {
+  background-color: var(--color-light);
+  color: var(--color-dark);
+}
+
+#nprogress .bar {
+  background: #15b8a6 !important;
+  height: 2px !important;
+  z-index: 9999999 !important;
+}
+
+#nprogress .bar {
+  position: fixed !important;
+}
+
+::-webkit-scrollbar {
+  @apply w-1;
+}
+
+::-webkit-scrollbar-track {
+  @apply rounded-[3px] bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply rounded-[3px] border-2 border-neutral-300 bg-neutral-600 dark:bg-neutral-400;
 }

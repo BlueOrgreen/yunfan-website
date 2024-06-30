@@ -32,7 +32,9 @@
     "eslint-plugin-unused-imports": "^2.0.0",
     "husky": "^8.0.0",
     "lint-staged": "^13.3.0",
-    "prettier": "^2.8.8"
+    "prettier": "^2.8.8",
+    "@commitlint/cli": "^17.8.0",
+    "@commitlint/config-conventional": "^17.8.0"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx,html,css,json}": [

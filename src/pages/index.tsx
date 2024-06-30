@@ -1,24 +1,25 @@
 import Image from 'next/image';
-import { GetStaticProps } from 'next';
+import { GetStaticProps, NextPage } from 'next';
+import { getCollection } from '@/common/libs/mdx';
+import Container from '@/common/components/elements/Container';
+import { siteMetadata } from '@/contents/siteMetadata';
+import { BlogItemProps } from '@/common/types/blog';
+import Home from '@/modules/home';
+import { NextSeo } from 'next-seo';
 
-export default function Home(props: any) {
-  console.log('Home Props===>', props);
-
+const HomePage: NextPage<{ blogList: BlogItemProps[] }> = ({ blogList }) => {
   return (
-    <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24`}
-    >
-      <div className='bg-red-400'>Home</div>
-    </main>
+    <>
+      <NextSeo title={`${siteMetadata.author} - Personal Website`} />
+      <Container data-aos='fade-up'>
+        <Home blogList={blogList} />
+      </Container>
+    </>
   );
-}
+};
 
 export const getStaticProps: GetStaticProps = async () => {
-  // const blogList = await getCollection('blog');
-  const blogList = [
-    { title: '标题1', body: '文章内容一' },
-    { title: '标题2', body: '文章内容二' },
-  ];
+  const blogList = await getCollection('blog');
 
   return {
     props: {
@@ -26,3 +27,5 @@ export const getStaticProps: GetStaticProps = async () => {
     },
   };
 };
+
+export default HomePage;

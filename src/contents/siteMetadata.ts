@@ -20,6 +20,15 @@ export const author = {
   description: '致力于能成为一名独立的开发者',
   workTogether: '可以邮箱、QQ、微信与我进行联系',
   calMeetingUrl: '13537107055',
+  github_accounts: [
+    {
+      username: 'BlueOrgreen',
+      token: process.env.GITHUB_READ_USER_TOKEN_PERSONAL,
+      endpoint: '/api/github?type=personal',
+      type: 'personal',
+      is_active: true,
+    },
+  ],
 };
 
 export const featureSwich = {

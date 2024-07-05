@@ -12,7 +12,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   onClearSearch,
 }) => {
   return (
-    <div className='flex items-center w-full sm:w-auto '>
+    <div className='flex items-center w-full sm:w-auto'>
       <div className='relative w-full'>
         <SearchIcon
           size={18}
@@ -20,7 +20,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         />
         <input
           type='text'
-          placeholder='Search...'
+          placeholder='查询'
           className='w-full py-2 px-10 border-2 dark:border-neutral-600 rounded-lg transition-all duration-300 text-sm font-sora'
           value={searchTerm}
           onChange={onSearchChange}

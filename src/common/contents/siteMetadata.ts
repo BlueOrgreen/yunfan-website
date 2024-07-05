@@ -10,6 +10,7 @@ export const siteMetadata = {
   image: '/images/avator.jpeg',
   siteDescription:
     '经验丰富的软件工程师，尤其是前端方面的软件工程师，热衷于创建像素完美的网络体验。同时热衷于与团队合作，交付高效、可扩展且具有视觉吸引力的 Web 应用程序。',
+  postPageSize: 9,
 };
 
 export const author = {

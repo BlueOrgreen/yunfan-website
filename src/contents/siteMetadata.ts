@@ -17,7 +17,8 @@ export const author = {
   city: '深圳',
   locationIcon: '🇨🇳',
   status: '喜茶-在职',
-  description: '致力于能成为一名独立的开发者',
+  description:
+    '多一些专业, 多一些极客精神, 这既是对自身的勉励, 也希望能呈现做出优秀的作品',
   workTogether: '可以邮箱、QQ、微信与我进行联系',
   calMeetingUrl: '13537107055',
   github_accounts: [

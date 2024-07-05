@@ -8,7 +8,7 @@ interface ContainerProps {
 
 const Container = ({ children, className = '', ...rest }: ContainerProps) => {
   return (
-    <div className={`bg-red mt-20 mb-10 lg:mt-0 p-9 ${className}`} {...rest}>
+    <div className={`mt-20 mb-10 lg:mt-0 p-9 ${className}`} {...rest}>
       {children}
     </div>
   );

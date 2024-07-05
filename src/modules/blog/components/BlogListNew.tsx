@@ -75,13 +75,13 @@ const BlogListNew = ({
             {searchTerm ? (
               <div>
                 <span className='text-neutral-600 dark:text-neutral-400 mr-2'>
-                  Search:
+                  查找:
                 </span>
                 <span className='italic'>{searchTerm}</span>
               </div>
             ) : (
               <h4 className='text-neutral-800 dark:text-neutral-200'>
-                Latest Articles
+                最新文章
               </h4>
             )}
             <span className='rounded-full py-1 px-2 bg-neutral-300 text-neutral-900 dark:bg-neutral-700 dark:text-neutral-50 text-xs font-sora'>

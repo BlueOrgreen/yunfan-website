@@ -63,7 +63,7 @@ const BlogCardNew = (blogData: BlogItemProps) => {
 
           <div className='flex flex-col justify-end'>
             <div className='flex flex-col space-y-3'>
-              <h3 className='font-sora text-lg font-medium text-neutral-100 group-hover:underline group-hover:underline-offset-4 '>
+              <h3 className='text-lg font-medium text-neutral-100 group-hover:underline group-hover:underline-offset-4 '>
                 {blogData.frontMatter.title}
               </h3>
               <div className='flex gap-1 items-center text-light'>

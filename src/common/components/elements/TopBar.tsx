@@ -2,7 +2,7 @@ import { siteMetadata } from '@/contents/siteMetadata';
 import { useTheme } from 'next-themes';
 import Image from './Image';
 
-const TopBar: React.FC<{}> = () => {
+const TopBar: React.FC = () => {
   const { resolvedTheme } = useTheme();
 
   const lightBg = 'linear-gradient(to right, #ffc3a0 0%, #ffafbd 100%)';

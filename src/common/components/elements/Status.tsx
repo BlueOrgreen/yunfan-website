@@ -1,6 +1,7 @@
-import useHasMounted from '@/common/hooks/useHasMounted';
 import { motion } from 'framer-motion';
 import { useTheme } from 'next-themes';
+
+import useHasMounted from '@/common/hooks/useHasMounted';
 
 const Status = () => {
   const { resolvedTheme } = useTheme();
@@ -16,7 +17,7 @@ const Status = () => {
         transition={{ duration: 0.5, repeat: Infinity }}
       />
       <span className=' text-neutral-600 dark:text-neutral-400 font-sora'>
-        {isDarkTheme ? '打开灯!' : '关闭灯!'}
+        {isDarkTheme ? '夜间' : '白昼'}
       </span>
     </div>
   );

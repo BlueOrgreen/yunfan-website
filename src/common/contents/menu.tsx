@@ -1,18 +1,15 @@
-import { MenuItemProps } from '@/common/types/menu';
 import { BiRocket as ContactIcon } from 'react-icons/bi';
-import { SiJavascript } from 'react-icons/si';
-
 import {
-  FiBookOpen as LearnIcon,
-  FiCoffee as ProjectIcon,
   FiCode as SnippetsIcon,
-  FiCpu as DashboardIcon,
+  FiCoffee as ProjectIcon,
   FiLayers as WeeklyIcon,
-  FiPieChart as AnalyticsIcon,
   FiPocket as HomeIcon,
   FiRss as BlogIcon,
   FiUser as ProfileIcon,
 } from 'react-icons/fi';
+import { SiJavascript } from 'react-icons/si';
+
+import { MenuItemProps } from '@/common/types/menu';
 
 const iconSize = 20;
 

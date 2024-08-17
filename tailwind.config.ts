@@ -15,6 +15,15 @@ const config: Config = {
         dark: '#121212',
         light: '#fafafa',
       },
+      keyframes: {
+        loop: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+      },
+      animation: {
+        'looping-tag': 'loop 100s linear infinite',
+      },
     },
   },
   plugins: [require('tailwind-scrollbar-hide')],

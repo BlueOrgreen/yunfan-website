@@ -3,8 +3,8 @@ import { NextSeo } from 'next-seo';
 import { useState } from 'react';
 
 import Container from '@/common/components/elements/Container';
-import { getCollection } from '@/common/libs/mdx';
 import PageHeading from '@/common/components/elements/PageHeading';
+import { getCollection } from '@/common/libs/mdx';
 import { ProjectItemProps } from '@/common/types/projects';
 import { siteMetadata } from '@/contents/siteMetadata';
 import Projects from '@/modules/projects';

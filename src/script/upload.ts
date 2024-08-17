@@ -72,7 +72,7 @@ const upload = async () => {
     {
       type: 'fuzzypath',
       name: 'input',
-      excludePath: (nodePath) => nodePath.startsWith('node_modules'),
+      excludePath: (nodePath: string) => nodePath.startsWith('node_modules'),
       itemType: 'directory',
       rootPath: './',
       message: '请选择输入目录路径',

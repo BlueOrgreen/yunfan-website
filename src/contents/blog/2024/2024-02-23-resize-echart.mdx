@@ -7,7 +7,7 @@ featured: true
 tags:
   - echarts
 draft: true
-featured_image_url: https://static.webjam.cn/images/202401/aulianza.webp
+featured_image_url: /blogs/aulianza.webp
 ---
 
 ## 问题
@@ -17,4 +17,3 @@ featured_image_url: https://static.webjam.cn/images/202401/aulianza.webp
 一开始我的想法是监听 `window` 的 `resize` 事件，当 `resize` 被触发的时候，调用渲染 `echarts` 图表的函数。
 
 后来发现 echarts 专门提供了 [`resize`](https://echarts.apache.org/zh/api.html#echartsInstance.resize) 方法用来改变图表的大小，这样就无需手动再次渲染图表了。
-

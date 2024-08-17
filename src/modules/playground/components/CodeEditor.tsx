@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import MonacoEditor, { EditorProps } from '@monaco-editor/react';
+import { editor } from 'monaco-editor';
 
 interface CodeEditorProps {
   code: string;
@@ -20,7 +21,7 @@ const editorConfig = {
   scrollBeyondLastLine: false,
   formatOnPaste: true,
   formatOnType: true,
-};
+} as editor.IStandaloneEditorConstructionOptions;
 
 const CodeEditor = ({
   code,

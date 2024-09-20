@@ -66,7 +66,7 @@ const BlogHeader = ({
       )}
       <div className='flex flex-col sm:flex-row gap-2 justify-between mb-6 pt-5 pb-6 border-b border-dashed border-neutral-600 text-neutral-600 dark:text-neutral-400 text-[14px]'>
         <div>
-          Published on
+          发布于
           <span className='px-1 font-medium'>
             {published_at ? formatDate(published_at) : ''}
           </span>
@@ -77,14 +77,14 @@ const BlogHeader = ({
             <ViewIcon size={16} />
             <div className='flex gap-1 ml-0.5'>
               <span>{page_views_count?.toLocaleString() || '-'}</span>
-              <span>Views</span>
+              <span>查看</span>
             </div>
           </div>
           <div className='flex gap-1 items-center font-medium'>
             <ClockIcon size={16} />
             <div className='flex gap-1 ml-0.5'>
               <span>{reading_time_minutes}</span>
-              <span>Minutes Read</span>
+              <span>分钟 阅读</span>
             </div>
           </div>
         </div>

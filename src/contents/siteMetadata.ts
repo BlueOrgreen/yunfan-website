@@ -48,3 +48,23 @@ export const socialAccounts = {
   github: 'https://github.com/BlueOrgreen',
   qq: '1936341390',
 };
+
+export const commentConfig = {
+  enable: false,
+  provider: 'giscus',
+  // https://giscus.app/
+  giscusConfig: {
+    gitUsername: '',
+    repo: '', // process.env.GISCUS_REPO
+    repositoryId: '', // process.env.GISCUS_REPOSITORY_ID
+    category: '', // process.env.GISCUS_CATEGORY
+    categoryId: '', // process.env.GISCUS_CATEGORY_ID
+    mapping: 'title',
+    reactions: true,
+    metadata: '0',
+    lightTheme: 'light',
+    darkTheme: 'transparent_dark',
+    themeURL: '',
+    lang: 'zh-CN',
+  },
+};

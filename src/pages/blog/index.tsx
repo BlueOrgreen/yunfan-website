@@ -1,10 +1,11 @@
+import { NextPage } from 'next';
+import { NextSeo } from 'next-seo';
+
 import Container from '@/common/components/elements/Container';
 import { siteMetadata } from '@/common/contents/siteMetadata';
 import { getCollection } from '@/common/libs/mdx';
 import { BlogItemProps } from '@/common/types/blog';
 import BlogListNew from '@/modules/blog';
-import { NextPage } from 'next';
-import { NextSeo } from 'next-seo';
 
 const PAGE_TITLE = '博客';
 

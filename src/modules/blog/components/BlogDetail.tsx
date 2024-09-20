@@ -16,7 +16,7 @@ const BlogDetail = (blogData: BlogDetailProps) => {
       <div className='article space-y-6 leading-[1.8] dark:text-neutral-300 '>
         {blogData.content && <MDXComponent>{blogData.content}</MDXComponent>}
       </div>
-      {blogData.frontMatter.tags.length >= 1 && (
+      {blogData.frontMatter.tags?.length >= 1 && (
         <div className='my-10 space-y-2'>
           <h6 className='text-lg font-medium'>Tags:</h6>
           <div className='flex flex-wrap gap-2 pt-2'>

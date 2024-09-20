@@ -81,5 +81,9 @@
     "**/*.{js,jsx,ts,tsx,html,css,json}": [
       "npx prettier --write"
     ]
+  },
+  "volta": {
+    "node": "20.16.0",
+    "yarn": "1.22.22"
   }
 }

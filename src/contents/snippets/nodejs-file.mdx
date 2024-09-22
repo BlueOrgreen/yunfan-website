@@ -1,0 +1,38 @@
+---
+title: Node JS - 文件
+description: 使用 NodeJs 进行文件操作
+slug: nodejs-file
+date: '2024-09-20'
+featured: fasle
+type: nodejs
+draft: true
+---
+
+## 文件操作
+
+获取当前文件的目录
+
+```js
+/**
+ * @description 获取当前文件的目录
+ */
+// 获取当前文件的目录
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+```
+
+写入文件
+
+```js
+/**
+ * @description 检查文件是否存在，如果不存在则创建并写入数据
+ */
+const checkDbFile = async () => {
+    const dbPath = resolve(__dirname, 'db.json');
+    if (!existsSync(dbPath)) {
+        const json = JSON.stringify(posts);
+        writeFileSync(dbPath, json);
+    }
+};
+```

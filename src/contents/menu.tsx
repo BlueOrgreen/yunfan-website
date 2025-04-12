@@ -57,10 +57,10 @@ export const MENU_ITEMS: MenuItemProps[] = [
     type: 'Pages',
   },
   {
-    title: '周刊',
-    href: '/weekly',
+    title: '图床',
+    href: '/imagebed',
     icon: <WeeklyIcon size={iconSize} />,
-    isShow: false,
+    isShow: true,
     isExternal: false,
     eventName: 'Pages: Weekly',
     type: 'Pages',

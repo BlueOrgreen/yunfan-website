@@ -1,12 +1,13 @@
 import AOS from 'aos';
+import type { AppProps } from 'next/app';
+import dynamic from 'next/dynamic';
 import { ThemeProvider } from 'next-themes';
 import { useEffect } from 'react';
-import Layout from '@/common/components/layouts';
+
 import '@/common/styles/globals.css';
 import 'aos/dist/aos.css';
 
-import type { AppProps } from 'next/app';
-import dynamic from 'next/dynamic';
+import Layout from '@/common/components/layouts';
 
 const ProgressBar = dynamic(
   () => import('src/common/components/elements/ProgressBar'),

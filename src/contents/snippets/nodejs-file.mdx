@@ -10,7 +10,7 @@ draft: true
 
 ## 文件操作
 
-获取当前文件的目录
+### 获取当前文件的目录
 
 ```js
 /**
@@ -22,9 +22,10 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 ```
 
-写入文件
+### 写入文件
 
 ```js
+import { existsSync, writeFileSync } from 'fs';
 /**
  * @description 检查文件是否存在，如果不存在则创建并写入数据
  */
@@ -35,4 +36,46 @@ const checkDbFile = async () => {
         writeFileSync(dbPath, json);
     }
 };
+
+const resetDbFile = async (data: IPost[]) => {
+    // 先检测一下文件，不存在则创建并写入初始数据
+    await checkDbFile();
+    const dbPath = resolve(__dirname, 'db.json');
+    // 写入的数据
+    const json = JSON.stringify(data);
+    fs.writeFileSync(dbPath, json);
+};
+```
+
+### 获取当前文件所在的目录: 1.ESM  2. CommonJS(可直接使用 __dirname 获取)
+
+```js
+// 在 ESM 中获取
+import { fileURLToPath } from 'url'
+import path from 'path'
+
+// 将 import.meta.url 转化为文件路径
+const __filename = fileURLToPath(import.meta.url)
+// 获取文件所在的目录路径
+const __dirname = path.dirname(__filename)
+
+```
+
+### 删除文件
+
+```bash
+# 直接使用 rm
+rm file.txt
+```
+
+在window系统不兼容的情况 使用 `rimraf` 
+
+pnpm add rimraf -D
+
+```js
+{
+    "scripts": {
+        "rm": "rimraf src/database/db.json"
+    }
+}
 ```

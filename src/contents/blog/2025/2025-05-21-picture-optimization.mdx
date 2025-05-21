@@ -1,0 +1,179 @@
+---
+title: 图片 - 性能优化实践
+slug: picture-optimization
+summary: '性能优化实践, 图片篇'
+date: '2025-05-21'
+featured_image_url: /blogs/echarts-pie.webp
+tags:
+  - optimization
+  - picture
+---
+
+在大多数网页上，图片占字节数的比例最高可达 60-65%，而网页大小是总渲染时间的主要因素
+在图片资源多的时候 图片资源加载慢会影响用户体验 譬如在`官网`、在`C端项目`上, 如何`优化图片资源加载`成了关键的因素
+
+譬如下面的场景
+
+![](/blogs/picture-optimization/slow-picture.png)
+
+
+很明显,可以看到这些图片加载时间较长, 导致页面进来了, 但是图片的展示效果还是一直在加载的状态; 
+
+其业务背景是在一个名为巡店的平台中加载加密的资源, 用于检察门店和物料情况, 图片的体积会较大, 因此需要在不影响原资源的画质清晰度下优化资源的加载
+
+![](/blogs/picture-optimization/slow-picture-2.png)
+
+分析可以看出, 2M的高清图片的耗时主要在资源的下载 => 可以针对资源的下载进行优化
+
+## 🗂️ 优化
+
+- [启用CDN 配置加速域名](#启用CDN配置加速域名)
+- [图片处理优化](#图片处理优化)
+
+## 启用CDN配置加速域名
+
+CDN加速域名: 指绑定在CDN上的域名, 目的是让用户更快地访问网站资源
+
+✅ 一句话解释
+> CDN加速域名 = 将资源通过CDN节点进行缓存和分发后使用的域名
+
+
+📦 举个例子：
+
+假设网站原始图片地址为
+
+```
+https://origin.heytea.com/images/a.jpg
+```
+
+启用了 CDN，并配置了加速域名，比如：
+
+```
+https://cdn.heytea.com/images/a.jpg
+```
+
+当用户访问 `cdn.heytea.com` 这个域名时:
+1. 请求会被就近的 CDN 节点接收
+2. 如果该节点已有缓存，就直接返回
+3. 如果没有缓存，CDN 会从源站拉取资源，再缓存下来
+4. 下一次再有访问，会直接命中 CDN 节点缓存，大大加快加载速度
+
+💡 CDN加速域名具备以下作用:
+
+
+| 作用 | 说明 | 
+| --- | --- | 
+| 📍 `就近访问` | 用户访问的是离他最近的 CDN 节点，而不是你服务器远在广州或北京 | 
+| ⚡ `提速加速`| 尤其适合图片、音视频、静态文件 | 
+| 🔒 `安全防护`| 可防止恶意攻击源站（源站隐藏） |
+| 📉 `降低带宽成本`| 流量命中 CDN 缓存，减少源站服务器压力 |
+| 🧱 `高可用` | 多地分发，某些节点宕机不影响整体访问 |
+
+
+tips: [怎么配置CDN加速域名](/blog/cdn-domain)
+
+
+
+## 图片处理优化
+
+[WebP压缩技术](https://developers.google.com/speed/webp/docs/compression?hl=zh-cn)
+
+`WebP` 是由 Google 开发的一种新型图片格式, 设计目标是在减少文件容量的同时，达到和JPEG、PNG、GIF格式相同的图片质量，并希望借此能够减少图片档在网络上的发送时间，
+Chrome、Opera 和 Android 均支持该格式。该格式经过优化，可让网页上的图片更小、加载更快。与 `PNG` 和 `JPEG` 图片相比，在视觉质量相当的情况下，WebP 图片的大小大约会缩小 `30%`。
+此外，WebP 图片格式在功能上与其他格式也完全兼容
+
+
+#### WebP 压缩技术方案
+
+🚀 方案总结：
+
+| 方案                                                  | 推荐场景                   | 优点                          | 缺点                            |
+| --------------------------------------------------- | ---------------------- | --------------------------- | ----------------------------- |
+| **1. 上传时转 WebP 并保存**                                | 图片长期使用、用于 SEO、前端不便控制参数 | 静态 WebP 文件、可预热 CDN、可被搜索引擎索引 | 多占存储空间、需要额外转码逻辑               |
+| **2. 访问时添加参数自动转 WebP（如 `?imageMogr2/format/webp`）** | 轻量、灵活、图片变化频繁或不需 SEO    | 无需额外存储、按需转换、一套流程走天下、可动态控制质量、大小等参数 | WebP 实时生成，首次访问处理时有一点性能开销，不适合 SEO 抓取(搜索引擎默认不会索引 webp 格式) |
+
+
+👇 详细分析
+
+✅ 方案一：上传时生成 WebP（静态 WebP 文件）
+
+- 想走极致性能 + SEO 友好型网站（如电商主图、博客、展示图）
+- 使用 WebP 作为主访问格式
+- 前端使用 `<picture>` 标签或根据 UA 动态切换图片地址
+
+操作方式：
+
+1. 上传原图到 COS
+2. 立即或异步生成 WebP 并保存为新文件（如 xxx.webp）
+3. 图片地址直接访问 https://cdn.xxx.com/image.webp
+
+
+✅ 方案二：访问时带参数转 WebP
+
+- 只关心用户体验，不在乎 SEO
+- 图片数量大，存储敏感
+- 前端或 CDN 能自动判断 UA（是否支持 WebP）
+
+✅ 建议方案（常用组合）：
+
+| 图片类型                  | 建议方式                         |
+| --------------------- | ---------------------------- |
+| 商品主图、官网 Banner、SEO 图片 | ✅ 上传时生成并保存 WebP              |
+| 用户上传的内容、头像、短期内容       | ✅ 访问时加参数动态转 WebP             |
+| 小程序 / App 使用          | ✅ 访问时加参数，前端控制是否请求 WebP       |
+| Web 浏览器访问 + CDN 加速    | ✅ 访问时加参数，前端控制是否请求 WebP |
+
+
+示例代码
+
+```tsx
+// components/WebpImage.tsx
+import React from "react";
+import { Image, ImageProps } from "antd";
+
+/**
+ * 自动拼接 WebP 转换参数，并支持懒加载的 Ant Design Image 组件封装
+ */
+const WebpImage: React.FC<ImageProps> = (props) => {
+  const { src = "", loading = "lazy", ...rest } = props;
+
+  // 拼接腾讯云 COS 的 WebP 转换参数
+  const webpSuffix = "imageMogr2/format/webp/quality/80";
+  const hasQuery = src.includes("?");
+  const webpSrc = hasQuery ? `${src}&${webpSuffix}` : `${src}?${webpSuffix}`;
+
+  return <Image src={webpSrc} loading={loading} {...rest} />;
+};
+
+export default WebpImage;
+```
+
+
+#### 如何根据UA判断是否支持 Webp?
+
+✅ 如果你有自己写的服务端（Node.js / PHP / etc），你可以读取请求的 UA，判断是否是 Chrome/Edge/新 Safari，再决定返回哪种图片格式（.webp or .jpg）
+
+✅ 如果你用了支持“UA 转 WebP”的 CDN（比如腾讯云 CDN、七牛、阿里云 OSS），你可以打开自动判断功能，由 CDN 自动处理
+
+❌ 如果你是静态站点，没有服务端或中间层，那你没法处理 UA，只能用 HTML `<picture>` 标签来交给浏览器判断加载哪种图片格式
+
+前端代码写：
+
+```html
+<picture>
+  <source srcset="xxx.webp" type="image/webp" />
+  <img src="xxx.jpg" alt="商品图" />
+</picture>
+```
+
+## 优化后效果
+
+![](/blogs/picture-optimization/fast-picture-1.png)
+
+使用 `webp` 格式，压缩后可降至 `<500KB` 同时访问时间也到了 `500ms` 内
+
+
+| 图片格式    | 大小    | 加载耗时（带宽在 4Mbps） |
+| ------- | ----- | ------------ |
+| 原始 JPG  | 2MB   | \~13 秒      |
+| WebP 格式 | 400KB | \~0.5 秒     |

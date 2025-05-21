@@ -6,6 +6,12 @@ import remarkGfm from 'remark-gfm';
 import remarkMdx from 'remark-mdx';
 import remarkParse from 'remark-parse';
 
+// const remarkSlug = require('remark-slug');
+// const remarkAutolinkHeadings = require('remark-autolink-headings');
+import remarkSlug from 'remark-slug';
+import remarkAutolinkHeadings from 'remark-autolink-headings';
+// const remarkAutolinkHeadings = require('remark-autolink-headings');
+
 import { calculateReadingTime, formatExcerpt } from '@/common/helpers';
 import { getTimestamp } from '@/common/helpers';
 export interface MdxFileProps {
@@ -33,7 +39,15 @@ export const _loadMdxFiles = (dirPath: string): MdxFileProps[] => {
       const mdxCompiler = remark()
         .use(remarkParse)
         .use(remarkGfm)
-        .use(remarkMdx);
+        .use(remarkMdx)
+        .use(remarkSlug)
+        .use(remarkAutolinkHeadings, {
+          behavior: 'append', // 或 'prepend'、'wrap'
+          content: {
+            type: 'text',
+            value: '#', // 可以是字符串，如 '🔗'
+          },
+        });
       const mdxContent = mdxCompiler.processSync(content).toString();
       const filename = file.endsWith('.mdx')
         ? file.replace('.mdx', '')
@@ -51,15 +65,6 @@ export const _loadMdxFiles = (dirPath: string): MdxFileProps[] => {
     });
 
   return contents;
-};
-
-export const getCollectionCount = (endpointer: string): number => {
-  const dirPath = path.join(process.cwd(), 'src/contents', endpointer);
-  const files = fs.readdirSync(dirPath);
-  const mdxFiles = files.filter(
-    (file) => file.endsWith('.mdx') || file.endsWith('.md')
-  );
-  return mdxFiles.length;
 };
 
 export const getCollection = (

@@ -1,0 +1,235 @@
+---
+title: React 项目国际化实践：前后端混合多语言方案落地
+slug: 多语言
+summary: '使用 react-i18next 实现前端国际化 技术实践'
+date: '2025-06-05'
+featured_image_url: /blogs/i18next/cover.webp
+tags:
+  - 国际化
+  - react-i18next
+---
+
+
+## 🌐 前后端混合多语言方案
+
+在中大型多语言系统中，简单的前端语言包往往无法满足所有场景，而后端全托管又容易带来维护复杂度。
+本篇文章介绍一种更具实用性的 前后端混合国际化策略，基于 `react-i18next` 实现灵活而强大的国际化支持。
+
+💡 为什么采用混合方案？
+
+| 类别 | 示例 | 来源 | 说明 | 
+| --- | --- | --- | --- | 
+| 📍 `UI 固定文案` |  按钮、菜单、提示 | 前端静态语言包  |  项目初始化时加载  | 
+| 📉 `业务数据文案`| 业务内容 | 接口返回语言字段  |  后端根据语言返回  | 
+
+
+
+## 🏗️ 项目结构与文件说明
+
+
+```bash
+├── src
+│   ├── locales
+│   │   ├── i18n.ts
+│   │   ├── lang
+│   │   │   ├── en_US
+│   │   │   │   ├── common.json        # 通用级别
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── sys.json           # 系统级别
+│   │   │   │   └── product.json       # 商品模块
+│   │   │   └── zh_CN
+│   │   │   │   ├── common.json        # 通用级别
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── sys.json           # 系统级别
+│   │   │   │   └── product.json       # 商品模块
+│   │   └── useLocale.ts
+│   └── index.tsx
+```
+
+
+## 🧩 初始化配置 i18n.ts
+
+```tsx
+import i18n from 'i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
+import { initReactI18next } from 'react-i18next';
+
+import { getStringItem } from '@/utils/storage';
+
+import en_US from './lang/en_US';
+import zh_CN from './lang/zh_CN';
+
+import { LocalEnum, StorageEnum } from '#/enum';
+
+const defaultLng = getStringItem(StorageEnum.I18N) || (LocalEnum.zh_CN as string);
+i18n
+    .use(LanguageDetector)
+    .use(initReactI18next)
+    .init({
+        debug: true,
+        lng: defaultLng, // localstorage -> i18nextLng: en_US
+        fallbackLng: LocalEnum.zh_CN,
+        interpolation: {
+            escapeValue: false, // not needed for react as it escapes by default
+        },
+        resources: {
+            en_US: { translation: en_US },
+            zh_CN: { translation: zh_CN },
+        },
+    });
+
+export default i18n;
+export const { t } = i18n;
+```
+
+在项目入口文件 Eg: `index.tsx` 文件引入
+
+```tsx
+// i18n
+import './locales/i18n';
+
+createRoot(document.getElementById('root')!).render(
+    <App />,
+);
+```
+
+切换语言的 hooks
+
+```tsx
+export default function useLocale() {
+    const { i18n } = useTranslation();
+    const setLocale = (locale: Locale) => {
+        i18n.changeLanguage(locale);
+    };
+    const locale = (i18n.resolvedLanguage || LocalEnum.en_US) as Locale;
+    const language = LANGUAGE_MAP[locale];
+
+    return {
+        locale,
+        language,
+        setLocale,
+    };
+}
+
+```
+
+ 使用前端文案
+
+```tsx
+export default function AccountDropdown() {
+  const { t } = useTranslation();
+    return (
+        <div>{t('common.okText')}</div>
+    )
+}
+```
+
+
+使用后端语言字段
+
+```tsx
+{
+  "name": {
+    "zh_CN": "夏日特饮",
+    "en_US": "Summer Drinks"
+  }
+}
+
+const lang = i18n.language; // 获取当前语言
+const name = data.name[lang];
+```
+
+## 📦 按模块拆分语言包
+
+```tsx
+import common from './common.json';
+import sys from './sys.json';
+
+export default {
+    common,
+    index,
+    sys,
+    product,
+};
+
+```
+
+> 原则: 小而美、模块独立、语义清晰、集中管理
+
+- 业务文案模块化（可维护）
+- key 命名规范化（可读性强）
+
+1. 系统级别的: 权限与认证相关、错误提示和状态反馈等放在 系统级别文件 `sys` 中
+2. 统一级别的: 放在 `common.json` 中的文案包括：`按钮`、`状态值`、`空状态`、`loading`、`确认框`等。
+3. 业务级别: 放在对应的业务模块下面 Eg: `product` 等等
+
+📄 举个例子
+
+```json
+{
+    "common": {
+        "okText": "OK",
+    }
+}
+```
+
+## ⚙️ 语言包体积大时的优化方案：CDN + 命名空间按需加载
+
+技术策略：
+
+1. 静态语言包放 CDN
+将各语言下的各命名空间的 .json 文件放在 CDN 上，例如：
+
+```txt
+https://cdn.example.com/i18n/zh_CN/common.json
+https://cdn.example.com/i18n/zh_CN/sys.json
+https://cdn.example.com/i18n/en_US/common.json
+```
+
+优势总结
+
+- 📦 降低主包体积（语言包独立加载）
+- ☁️ 静态资源部署灵活（CDN 加速全球访问）
+
+2. 配置 i18next 的 backend 插件
+使用 `i18next-http-backend` 支持按需加载命名空间：
+
+
+```tsx
+import i18n from 'i18next';
+import Backend from 'i18next-http-backend';
+import { initReactI18next } from 'react-i18next';
+
+i18n
+  .use(Backend)
+  .use(initReactI18next)
+  .init({
+    lng: 'zh_CN',
+    fallbackLng: 'zh_CN',
+    ns: ['common'], // 初始化加载的命名空间
+    defaultNS: 'common',
+    backend: {
+      loadPath: 'https://cdn.example.com/i18n/{{lng}}/{{ns}}.json',
+    },
+    interpolation: {
+      escapeValue: false,
+    },
+  });
+```
+
+如何使用
+
+```tsx
+const { t, ready } = useTranslation('sys');
+
+if (!ready) return <Loading />;
+return <div>{t('sys.login.title')}</div>;
+```
+
+
+工作原理解析：
+
+{{lng}}：语言 由 i18n.language 决定，例如 'zh_CN' 或 'en_US'
+
+{{ns}}：命名空间 由 useTranslation('sys') 或 i18n.loadNamespaces(['sys']) 等代码中传入的命名空间决定。
+

@@ -2,18 +2,22 @@
 title: echarts 图表根据容器大小自动改变
 slug: resize-echarts
 summary: '在有些场景下，我们希望当容器大小改变时，图表的大小也相应地改变。'
-date: '2024-02-23'
+date: '2024-10-23'
 featured: false
 tags:
   - echarts
 draft: true
-featured_image_url: /blogs/aulianza.webp
+featured_image_url: /blogs/resize-echart/cover.webp
 ---
+
+
+
+<img src="/blogs/resize-echart/cover.webp" />
 
 ## 问题
 
 今天修复一个早期项目的问题，具体情况是：页面上有一些使用 echats 渲染的图表，当修改浏览器窗口大小的时候，这些图表没有自动重新渲染至合适大小。
-
+{/* ![](/blogs/resize-echart/cover.webp) */}
 一开始我的想法是监听 `window` 的 `resize` 事件，当 `resize` 被触发的时候，调用渲染 `echarts` 图表的函数。
 
 后来发现 echarts 专门提供了 [`resize`](https://echarts.apache.org/zh/api.html#echartsInstance.resize) 方法用来改变图表的大小，这样就无需手动再次渲染图表了。

@@ -1,0 +1,161 @@
+---
+title: 基于 React 的多端动态表单渲染器设计与实践
+slug: react-multi-platform-dynamic-form-renderer
+summary: '基于 React 的多端动态表单渲染器设计与实践'
+date: '2025-08-29'
+featured: true
+tags:
+  - react多端渲染器
+  - 动态表单
+draft: true
+featured_image_url: /blogs/multi-dynamic-formrender/cover.webp
+---
+
+# 基于 React 的多端动态表单渲染器设计与实践
+
+
+## 一、背景与动机
+
+
+随着公司门店数量的不断增加，`选址`、`开店`、`拓展`、`运营与管理`逐渐成为企业运营的核心环节。为了支撑这一目标，公司建设了门店生命周期中台，对门店从筹建到开业再到营运进行全流程管理。
+
+在这一过程中，涉及了 `多端系统` 的建设，包括 H5 端、Web 端以及 App 端。其中，`门店管理平台`主要面向 `Web 与 H5` 两端，虽然两端在交互与体验上存在差异，但在 `业务流程审批` 上却高度一致。
+
+如果为每个端单独维护表单页面，不仅开发成本高，而且在业务规则频繁调整的情况下，更新迭代效率会受到极大影响。基于此，我们希望能够实现：
+
+- `一次配置，多端渲染`：通过统一的 Schema 配置，支持表单在不同端的动态渲染。
+
+- `快速适配业务变更`：当业务流程调整时，仅需修改配置而非重写代码。
+
+- `提升研发效率与复用率`：减少重复开发，统一表单逻辑与组件管理。
+
+因此，设计并实现了一套 `基于 React 的动态表单渲染器` 在 `pnpm Monorepo` 架构 下，渲染器作为独立子包进行维护，业务项目则划分为 Web 与 H5 两个子包，通过共享同一渲染器实现多端表单渲染，从而支撑门店业务的快速迭代与规模化扩张。
+
+## 二、项目架构设计
+
+
+![技术架构图](/blogs/multi-dynamic-formrender/architecture-img.png)
+
+### 设计思路
+
+在项目架构上，采用 `pnpm Monorepo` 的方式，将项目拆分为三个子包：
+
+- H5 端业务项目：面向移动端，基于 `antd-mobile` 实现交互。
+
+- Web 端业务项目：面向桌面端，基于 `antd-design` 实现交互。
+
+- 渲染器包 `（yida-form-render）`：核心渲染器，负责解析 `Schema` 并动态渲染表单。
+
+### 表单渲染流程
+
+Schema 获取
+
+- 表单 `Schema` 在 `宜搭平台` 上进行配置与生成。
+
+- 在业务项目中，根据不同的任务 `code` 请求对应的表单 `Schema`。
+
+Schema 格式化与处理
+
+渲染器包 `yida-form-render` 提供了` usePageSchemaData` hooks 方法。
+
+调用该方法时传入任务 `code` ，即可获取到格式化后的 `formatedSchemas` 数据。
+
+表单渲染
+
+将 `formatedSchemas` 传入 `LowCodeForm` 渲染器组件。
+
+`LowCodeForm` 会根据 `Schema` 配置动态生成表单。
+
+### 多端组件适配问题
+
+由于 H5 端基于` antd-mobile`，Web 端基于 `antd-design` ，二者的组件体系不同，为了解决多端渲染适配问题，设计了 `组件注册机制`：
+
+在业务项目中 `注册所需组件` ，并映射到渲染器中使用。
+
+渲染器只关心抽象的组件类型，不依赖具体实现。
+
+不同端可以通过注册方式接入各自适配的组件，从而实现 `一次配置，多端渲染`。
+
+同时支持自定义组件
+
+## 三、技术细节与重难点突破
+
+### 1. 表单字段的复杂处理
+
+在实际业务中，表单往往不只是简单的输入输出，还涉及到复杂的 字段联动、动态校验与布局控制。
+
+- `表单联动`：例如 A 字段选择后，B 字段是否展示或值范围随之改变。通过 Schema 中配置联动规则，在渲染器层统一解析，避免散落在各业务代码中。
+
+- `动态校验规则`：某些字段的校验规则并非固定，而是依赖于其他字段的值变化。
+
+> 实现思路图
+
+![表单联动思路图](/blogs/multi-dynamic-formrender/form-linkage.png)
+
+整体流程
+
+- 业务端拿到自定义 schemas 配置（来自宜搭平台）
+
+- 格式化/合成 schema（把业务 schema + 自定义schema 组合成完整的 `formatedSchemas` ）
+
+- 初始化渲染器状态：调用 `useFormStore.initialize({ components, events }`)，内部通过 `flattenTree` 把组件树展平成 `components` 字典
+
+- 渲染 `LowCodeForm`：组件读取 `useFormStore` 的 `state`（如 components、form），根据组件状态渲染 UI
+
+- 用户交互 → 触发事件 → triggerEvent 执行 `handler` 中匹配的事件 →  `updateComponent` 更新组件属性/值 从而完成联动或动态校验规则修改
+
+
+
+### 2. 数据源优化与请求控制
+
+下拉框、级联选择等控件通常需要远程接口获取数据。渲染器设计时支持异步数据源配置
+
+在多端表单渲染过程中，如果不加控制，极易出现 `重复请求` 或 `并发过多` 的问题：
+
+- `数据源缓存`：同一个接口返回的数据如果已获取过，则直接复用，避免重复请求。
+
+- `请求去重`：对于多个 Select 控件同时请求同一接口的情况，渲染器内部做合并处理，仅发起一次请求，其余控件共享结果。
+
+- `并发控制`：通过请求队列与并发数限制，避免瞬时发起过多接口调用导致的网络阻塞。
+
+> 实现思路图
+
+![数据源管理思路图](/blogs/multi-dynamic-formrender/async-data-fetch.png)
+
+
+### 数据源管理器核心功能
+
+- 数据源缓存
+
+当一个接口请求过一次数据后，将结果缓存
+
+下一次请求同一接口时，直接返回缓存结果
+
+
+- 请求去重
+
+当多个控件同时请求同一个接口时，只发起一次请求
+
+后续控件直接复用首次请求的 Promise 结果
+
+关键点是用 一个 Map 存储进行中的 Promise
+
+- 并发控制
+
+设置最大并发数（例如 5）
+
+如果请求超过并发限制，先放入队列排队
+
+请求完成后，自动触发队列中的下一个请求
+
+```tsx
+// 用 zustand 来维护三个状态：
+interface DataSourceState {
+  cache: Record<string, any>; // 接口缓存
+  pending: Record<string, Promise<any>>; // 正在请求的接口
+  queue: Array<() => void>; // 请求队列
+  concurrent: number; // 当前并发数
+  maxConcurrent: number; // 最大并发数
+  fetchData: (key: string, fetcher: () => Promise<any>) => Promise<any>;
+}
+```

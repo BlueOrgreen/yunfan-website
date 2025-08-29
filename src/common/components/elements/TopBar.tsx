@@ -1,5 +1,7 @@
-import { siteMetadata } from '@/contents/siteMetadata';
 import { useTheme } from 'next-themes';
+
+import { siteMetadata } from '@/contents/siteMetadata';
+
 import Image from './Image';
 
 const TopBar: React.FC = () => {
@@ -16,7 +18,7 @@ const TopBar: React.FC = () => {
       style={{ backgroundImage: bg }}
     >
       <span>🌟🍺✨🎉</span>
-      <span>你好，2024</span>
+      <span>你好，2025</span>
       <span>🎉✨🍺🌟</span>
       <a
         href={siteMetadata.siteUrl}

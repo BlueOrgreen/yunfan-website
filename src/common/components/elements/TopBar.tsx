@@ -33,6 +33,7 @@ const TopBar: React.FC = () => {
         height={30}
         alt='new'
       />
+      <span className='text-sm dark:text-neutral-300'>粤ICP备2025373106号</span>
     </div>
   );
 };

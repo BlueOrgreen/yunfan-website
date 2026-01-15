@@ -3,7 +3,7 @@ title: Taildwind CSS 在中后台项目中的样式治理实践
 slug: Tailwind CSS
 summary:  Taildwind CSS 样式治理实践
 date: '2025-12-26'
-featured_image_url: /blogs/elevator/cover.png
+featured_image_url: /blogs/tailwindcss/cover.webp
 tags:
   - Tailwind CSS
 ---
@@ -14,4 +14,146 @@ tags:
 
 > 在中后台项目中关键不是用不用 `Taildwind CSS` 而是有没有一套清晰的样式治理规则
 
+
+## @layer
+
+> `@layer` 是 Tailwind 用来 "管理 CSS 优先级与注入顺序"的机制
+
+Tailwind 把所有样式人为划分为 3 个层级（layer）：
+
+- `base`        → 最基础样式（reset / html、body、h1 等）
+- `components`  → 组件级样式（按钮、卡片、表单）
+- `utility`   → 原子工具类（mt-4、text-sm、flex）
+
+它的核心目的只有一个：
+
+> 让你写的 CSS 能安全地和 Tailwind 共存，不被随便覆盖，也不会乱覆盖别人
+
+
+## 为什么不用普通的 CSS 而是要用 `@layer`
+
+Tailwind 的生成顺序是固定的, 最终生成的 CSS顺序是
+
+```CSS
+@layer base;
+@layer components;
+@layer utilities;
+```
+
+如果你不使用 `@layer`：
+
+```CSS
+h1 {
+  font-size: 24px;
+}
+```
+
+那写的样式可能会: 被 Tailwind 的 `base` 覆盖、或被 `@utility` 覆盖、或在不同构建方式下顺序不稳定; 总而言之就是 `不可控`
+
+
+`@layer` 可以 `插队到指定层级`
+
+```CSS
+@layer base {
+  ...
+}
+```
+
+上面代码表示 CSS 内容会被注入到 `Tailwind` 的 `base` 层
+
+`在 base 层适合放`
+
+- 全局 reset
+- html/body
+- 标题 h1 - h6
+- 全局字体、字号
+
+
+# Tailwind CSS 在中后台项目中的样式治理实践
+
+## 背景与问题
+
+在中后台系统中，前端样式往往面临以下共性问题：
+
+- 页面多、模块复杂，不同业务线并行开发
+- 表单、表格、审批流等高频 UI 场景
+- 长期迭代中样式易失控，出现：
+- 传统的 CSS / SCSS 在项目规模扩大后，维护成本和心智负担急剧上升
+
+## 为什么选择 Tailwind 做中后台样式方案
+
+Tailwind 的优势并不在 `写得快`，而在于 `可控性和可治理性`：
+
+1. 样式与组件强绑定
+
+- 样式不再是 `全局漂浮的 CSS`
+- 每个组件的样式天然和 JSX 绑定
+- 减少“这个 class 到底被谁用了”的不确定性
+
+2. 原子化样式，避免命名污染
+
+- 避免 `.container`、`.content` 这类高冲突命名
+- 样式即语义
+
+3. 官方支持样式分层 `@layer`
+
+- 提供的 `base` `components` `utility` 这些为样式治理提供了制度级的基础
+
+
+## 中后台项目的样式分层设计
+
+我们将样式分为三层：
+
+```text
+Base（基础规范层）
+↓
+Components（组件规范层）
+↓
+Utilities（业务使用层）
+```
+
+
+- `Base` 层: 统一浏览器差异、建立设计基准、不涉及任何业务语义
+- `Components`层: 沉淀可复用 UI 规范 只描述组件长什么样, 不关心业务数据和页面布局
+- `Utility` 层: 业务自由组合层
+
+
+#### Utility: 业务自由组合层
+
+目标: 让业务页面快速搭建、不引入额外的CSS文件、最大组合能力
+
+原则: 业务样式只能使用 utility 不允许写入新的 class
+
+达到效果: 样式只影响当前的组件、页面样式天然隔离、删除组件即删除样式
+
+> 总之 Tailwind 并不是 `不要CSS` 而是通过原子化和分层机制 让 CSS重新变得可管理、可约束、可演进; 而在中后台项目中, 真正关键不是用不用 Taildwind 而是有没有一套清晰的样式治理规则
+
+
+
+
+## @reference
+
+css 文件
+
+```css
+@reference "#tailwind.css";
+
+.list {}
+```
+
+package.json
+
+```json
+{
+   "imports": {
+        "#tailwind.css": "./src/app/styles/tailwind.css"
+    },
+}
+```
+
+那 `@reference` 是什么?
+
+`@reference` 是 现代 CSS 打包器 支持的指令, 其语义是:
+
+> 只引用另一个 CSS文件的符号 / 变量 / layer / utilities; 不复制样式; 不产生额外输出#tailwind.css
 
